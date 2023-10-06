@@ -57,7 +57,10 @@ const run = async () => {
 
     const triggerResponse = await fetch(`${API_URL}/${urlPostfix}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiToken}` },
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        'content-type': 'application/json; charset=utf-8',
+      },
       body: JSON.stringify({
         type: ACTION_TYPE,
         payload: {
