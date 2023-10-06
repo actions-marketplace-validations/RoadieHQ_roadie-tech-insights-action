@@ -41,6 +41,7 @@ const fs = __importStar(require("fs"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const github_1 = require("@actions/github");
 const catalog_model_1 = require("@backstage/catalog-model");
+const isEmpty_1 = __importDefault(require("lodash/isEmpty"));
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -76,12 +77,16 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         var _b, _c;
         const entityRef = entities.map(it => (0, catalog_model_1.stringifyEntityRef)(it))[entitySelector];
         const branchRef = (_c = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head) === null || _c === void 0 ? void 0 : _c.ref;
-        const urlPostfix = checkId
+        console.log(`Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}`);
+        const urlPostfix = (0, isEmpty_1.default)(checkId)
             ? `checks/${checkId}/action`
             : `scorecards/${scorecardId}/action`;
         const triggerResponse = yield (0, node_fetch_1.default)(`${API_URL}/${urlPostfix}`, {
             method: 'POST',
-            headers: { Authorization: `Bearer ${apiToken}` },
+            headers: {
+                Authorization: `Bearer ${apiToken}`,
+                'content-type': 'application/json; charset=utf-8',
+            },
             body: JSON.stringify({
                 type: ACTION_TYPE,
                 payload: {

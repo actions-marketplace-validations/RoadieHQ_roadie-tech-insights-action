@@ -1,6 +1,6 @@
 {
   "name": "roadie-tech-insights-action",
-  "version": "0.0.2-alpha",
+  "version": "0.0.3-alpha",
   "description": "Run Roadie Tech Insights scorecards or checks and keep track of your tech health",
   "repository": "git@github.com:RoadieHQ/roadie-tech-insights-action.git",
   "author": "Roadie <engineering@roadie.io>",
@@ -16,6 +16,7 @@
     "@actions/github": "^5.1.1",
     "@backstage/catalog-model": "^1.4.2",
     "@vercel/ncc": "^0.36.1",
+    "lodash": "^4.17.21",
     "yaml": "^2.2.2",
     "node-fetch": "^3.3.1",
     "simple-git": "^3.18.0"
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@spotify/prettier-config": "^12.0.0",
     "@types/node": "^18.16.4",
+    "@types/lodash": "^4.14.199",
     "prettier": "^3.0.3",
     "typescript": "^5.0.4"
   },

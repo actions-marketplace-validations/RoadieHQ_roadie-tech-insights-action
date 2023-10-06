@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import fetch from 'node-fetch';
 import { context } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
+import isEmpty from 'lodash/isEmpty';
 
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
@@ -51,7 +52,12 @@ const run = async () => {
       entitySelector
     ];
     const branchRef = context.payload.pull_request?.head?.ref;
-    const urlPostfix = checkId
+
+    console.log(
+      `Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}`,
+    );
+
+    const urlPostfix = isEmpty(checkId)
       ? `checks/${checkId}/action`
       : `scorecards/${scorecardId}/action`;
 
