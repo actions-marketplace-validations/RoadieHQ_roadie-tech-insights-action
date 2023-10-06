@@ -1,0 +1,26 @@
+name: Roadie Tech Insights Action
+author: RoadieHQ
+description: "Runs Roadie Tech Insights Scorecards and Checks against a Pull Request"
+inputs:
+  api-token:
+    description: 'An API token added as a Bearer token to the Roadie API requests'
+    required: true
+  catalog-info-path:
+    description: "Path to the yaml file representing the Backstage entity linked to this repository/PR. Defaults to `./catalog-info.yaml`"
+    required: false
+    default: './catalog-info.yaml'
+  scorecard-id:
+    description: 'The id of the scorecard to run'
+    required: false
+  check-id:
+    description: 'The id of the check to run'
+    required: false
+  entity-selector:
+    description: 'An index of the entity to use from a multiyaml manifest file.'
+    required: false
+branding:
+  icon: 'check-circle'
+  color: 'orange'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

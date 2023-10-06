@@ -1,0 +1,36 @@
+on: [ pull_request ]
+
+jobs:
+  test-roadie-tech-insights-action:
+    name: Test Roadie Tech Insights Action
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 16 ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: yarn install
+      - run: yarn build
+
+      - name: Test Roadie Tech Insights on-demand Scorecard API call
+        id: test-action-scorecard
+        uses: ./
+        with:
+          catalog-info-path: './catalog-info.yaml'
+          api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
+          scorecard-id: '1111-2222'
+
+      - name: Test Roadie Tech Insights on-demand Check API call
+        id: test-action-check
+        uses: ./
+        with:
+          catalog-info-path: './catalog-info.yaml'
+          api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
+          check-id: '1111-2222'

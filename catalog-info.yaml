@@ -1,0 +1,13 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: roadie-tech-insights-action
+  title: Runs Roadie Tech Insights on-demand to check Pull Request validity
+  annotations:
+    github.com/project-slug: roadiehq/roadie-tech-insights-action
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: library
+  owner: RoadieHQ
+  lifecycle: production

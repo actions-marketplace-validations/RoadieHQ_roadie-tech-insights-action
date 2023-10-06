@@ -1,0 +1,4 @@
+site_name: 'roadie-tech-insights-action'
+
+plugins:
+  - techdocs-core
