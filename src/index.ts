@@ -10,8 +10,8 @@ const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 
 const run = async () => {
-  const scorecardId = core.getInput('check-id');
-  const checkId = core.getInput('scorecard-id');
+  const checkId = core.getInput('check-id');
+  const scorecardId = core.getInput('scorecard-id');
   const catalogInfoPath =
     core.getInput('catalog-info-path') ?? './catalog-info.yaml';
   const apiToken = core.getInput('api-token');

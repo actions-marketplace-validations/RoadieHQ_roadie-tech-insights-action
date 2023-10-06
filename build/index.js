@@ -46,8 +46,8 @@ const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const scorecardId = core.getInput('check-id');
-    const checkId = core.getInput('scorecard-id');
+    const checkId = core.getInput('check-id');
+    const scorecardId = core.getInput('scorecard-id');
     const catalogInfoPath = (_a = core.getInput('catalog-info-path')) !== null && _a !== void 0 ? _a : './catalog-info.yaml';
     const apiToken = core.getInput('api-token');
     function getEntitySelector(x, base) {
