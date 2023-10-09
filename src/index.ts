@@ -144,8 +144,8 @@ const run = async () => {
       const octokit = getOctokit(repoToken);
       await octokit.rest.issues.createComment({
         issue_number: context.payload.pull_request?.number!,
-        owner: context.payload.repo.owner,
-        repo: context.payload.repo.name,
+        owner: context.payload.repository?.owner.name!,
+        repo: context.payload.repository?.name!,
         body: JSON.stringify(results),
       });
     }
@@ -159,8 +159,8 @@ const run = async () => {
       const octokit = getOctokit(repoToken);
       await octokit.rest.issues.createComment({
         issue_number: context.payload.pull_request?.number!,
-        owner: context.payload.repo.owner,
-        repo: context.payload.repo.name,
+        owner: context.payload.repository?.owner.name!,
+        repo: context.payload.repository?.name!,
         body: JSON.stringify(results),
       });
     }

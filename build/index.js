@@ -46,7 +46,7 @@ const isScorecardResponse = (it) => !('checkResults' in it.data);
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f, _g;
     const repoToken = core.getInput('repo-token', { required: true });
     const checkId = core.getInput('check-id');
     const scorecardId = core.getInput('scorecard-id');
@@ -76,9 +76,9 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     const triggerOnDemandRun = (entities) => __awaiter(void 0, void 0, void 0, function* () {
-        var _d, _e;
+        var _h, _j;
         const entityRef = entities.map(it => (0, catalog_model_1.stringifyEntityRef)(it))[entitySelector];
-        const branchRef = (_e = (_d = github_1.context.payload.pull_request) === null || _d === void 0 ? void 0 : _d.head) === null || _e === void 0 ? void 0 : _e.ref;
+        const branchRef = (_j = (_h = github_1.context.payload.pull_request) === null || _h === void 0 ? void 0 : _h.head) === null || _j === void 0 ? void 0 : _j.ref;
         const urlPostfix = !(0, isEmpty_1.default)(checkId)
             ? `checks/${checkId}/action`
             : `scorecards/${scorecardId}/action`;
@@ -117,8 +117,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             const octokit = (0, github_1.getOctokit)(repoToken);
             yield octokit.rest.issues.createComment({
                 issue_number: (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.number,
-                owner: github_1.context.payload.repo.owner,
-                repo: github_1.context.payload.repo.name,
+                owner: (_c = github_1.context.payload.repository) === null || _c === void 0 ? void 0 : _c.owner.name,
+                repo: (_d = github_1.context.payload.repository) === null || _d === void 0 ? void 0 : _d.name,
                 body: JSON.stringify(results),
             });
         }
@@ -128,9 +128,9 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             console.log(results);
             const octokit = (0, github_1.getOctokit)(repoToken);
             yield octokit.rest.issues.createComment({
-                issue_number: (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.number,
-                owner: github_1.context.payload.repo.owner,
-                repo: github_1.context.payload.repo.name,
+                issue_number: (_e = github_1.context.payload.pull_request) === null || _e === void 0 ? void 0 : _e.number,
+                owner: (_f = github_1.context.payload.repository) === null || _f === void 0 ? void 0 : _f.owner.name,
+                repo: (_g = github_1.context.payload.repository) === null || _g === void 0 ? void 0 : _g.name,
                 body: JSON.stringify(results),
             });
         }
