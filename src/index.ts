@@ -6,6 +6,40 @@ import { context } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import isEmpty from 'lodash/isEmpty';
 
+type CheckResult = {
+  entity: string;
+  checkResults: {
+    result: boolean;
+    id: string;
+    check_id: string;
+    entity: string;
+    created_at: string;
+    last_updated_at: string;
+    missing?: boolean;
+    check: any;
+  };
+};
+type OnDemandCheckResult = {
+  checkResults: CheckResult[];
+  factResults: {
+    id: string;
+    entity: string;
+    facts: Record<string, any>;
+  }[];
+};
+
+type ScorecardResultResponse = {
+  data: Record<string, OnDemandCheckResult>;
+};
+
+type CheckResultResponse = {
+  data: OnDemandCheckResult;
+};
+
+const isScorecardResponse = (
+  it: ScorecardResultResponse | CheckResultResponse,
+): it is ScorecardResultResponse => !('checkResults' in it.data);
+
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 
@@ -47,7 +81,9 @@ const run = async () => {
     return;
   }
 
-  const triggerOnDemandRun = async (entities: Entity[]): Promise<any> => {
+  const triggerOnDemandRun = async (
+    entities: Entity[],
+  ): Promise<ScorecardResultResponse | CheckResultResponse> => {
     const entityRef = entities.map(it => stringifyEntityRef(it) as string)[
       entitySelector
     ];
@@ -75,7 +111,7 @@ const run = async () => {
         },
       }),
     });
-    return await triggerResponse.json();
+    return (await triggerResponse.json()) as ScorecardResultResponse;
   };
 
   try {
@@ -93,7 +129,24 @@ const run = async () => {
     const parsedManifest = roadieManifest.map(yamlDoc => yamlDoc.toJS());
 
     const onDemandResult = await triggerOnDemandRun(parsedManifest);
-    console.log(onDemandResult);
+
+    if (onDemandResult && isScorecardResponse(onDemandResult)) {
+      console.log(JSON.stringify(onDemandResult));
+      console.log(
+        Object.values(onDemandResult.data).map(result =>
+          result.checkResults.map(
+            individualResult => individualResult.checkResults.result,
+          ),
+        ),
+      );
+    }
+    if (onDemandResult && !isScorecardResponse(onDemandResult)) {
+      console.log(JSON.stringify(onDemandResult));
+      console.log(
+        onDemandResult.data.checkResults.map(res => res.checkResults.result),
+      );
+    }
+
     return;
   } catch (error) {
     core.setFailed((error as Error).message);
