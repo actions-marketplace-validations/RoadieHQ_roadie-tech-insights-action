@@ -53,15 +53,15 @@ const run = async () => {
     ];
     const branchRef = context.payload.pull_request?.head?.ref;
 
-    console.log(
-      `Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}`,
-    );
-
-    const urlPostfix = isEmpty(checkId)
+    const urlPostfix = !isEmpty(checkId)
       ? `checks/${checkId}/action`
       : `scorecards/${scorecardId}/action`;
+    const url = `${API_URL}/${urlPostfix}`;
+    console.log(
+      `Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}.\n\n Calling URL: ${url}`,
+    );
 
-    const triggerResponse = await fetch(`${API_URL}/${urlPostfix}`, {
+    const triggerResponse = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiToken}`,

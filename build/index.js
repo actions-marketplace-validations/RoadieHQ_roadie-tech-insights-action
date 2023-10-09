@@ -77,11 +77,12 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         var _b, _c;
         const entityRef = entities.map(it => (0, catalog_model_1.stringifyEntityRef)(it))[entitySelector];
         const branchRef = (_c = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head) === null || _c === void 0 ? void 0 : _c.ref;
-        console.log(`Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}`);
-        const urlPostfix = (0, isEmpty_1.default)(checkId)
+        const urlPostfix = !(0, isEmpty_1.default)(checkId)
             ? `checks/${checkId}/action`
             : `scorecards/${scorecardId}/action`;
-        const triggerResponse = yield (0, node_fetch_1.default)(`${API_URL}/${urlPostfix}`, {
+        const url = `${API_URL}/${urlPostfix}`;
+        console.log(`Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}.\n\n Calling URL: ${url}`);
+        const triggerResponse = yield (0, node_fetch_1.default)(url, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${apiToken}`,
