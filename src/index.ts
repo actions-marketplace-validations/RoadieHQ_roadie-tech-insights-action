@@ -6,21 +6,22 @@ import { context } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import isEmpty from 'lodash/isEmpty';
 
+type CheckResultContents = {
+  result: boolean;
+  id: string;
+  check_id: string;
+  entity: string;
+  created_at: string;
+  last_updated_at: string;
+  missing?: boolean;
+  check: any;
+};
 type CheckResult = {
   entity: string;
-  checkResults: {
-    result: boolean;
-    id: string;
-    check_id: string;
-    entity: string;
-    created_at: string;
-    last_updated_at: string;
-    missing?: boolean;
-    check: any;
-  };
+  checkResults: CheckResultContents[];
 };
 type OnDemandCheckResult = {
-  checkResults: CheckResult[];
+  checkResults: CheckResult;
   factResults: {
     id: string;
     entity: string;
@@ -134,8 +135,8 @@ const run = async () => {
       console.log(JSON.stringify(onDemandResult));
       console.log(
         Object.values(onDemandResult.data).map(result =>
-          result.checkResults.map(
-            individualResult => individualResult.checkResults.result,
+          result.checkResults.checkResults.map(
+            individualResult => individualResult.result,
           ),
         ),
       );
@@ -143,7 +144,9 @@ const run = async () => {
     if (onDemandResult && !isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
       console.log(
-        onDemandResult.data.checkResults.map(res => res.checkResults.result),
+        onDemandResult.data.checkResults.checkResults.map(
+          individualResult => individualResult.result,
+        ),
       );
     }
 

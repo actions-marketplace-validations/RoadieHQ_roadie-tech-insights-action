@@ -111,11 +111,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const onDemandResult = yield triggerOnDemandRun(parsedManifest);
         if (onDemandResult && isScorecardResponse(onDemandResult)) {
             console.log(JSON.stringify(onDemandResult));
-            console.log(Object.values(onDemandResult.data).map(result => result.checkResults.map(individualResult => individualResult.checkResults.result)));
+            console.log(Object.values(onDemandResult.data).map(result => result.checkResults.checkResults.map(individualResult => individualResult.result)));
         }
         if (onDemandResult && !isScorecardResponse(onDemandResult)) {
             console.log(JSON.stringify(onDemandResult));
-            console.log(onDemandResult.data.checkResults.map(res => res.checkResults.result));
+            console.log(onDemandResult.data.checkResults.checkResults.map(individualResult => individualResult.result));
         }
         return;
     }
