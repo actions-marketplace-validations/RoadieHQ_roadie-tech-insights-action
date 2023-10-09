@@ -46,7 +46,8 @@ const isScorecardResponse = (it) => !('checkResults' in it.data);
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b, _c;
+    const repoToken = core.getInput('repo-token', { required: true });
     const checkId = core.getInput('check-id');
     const scorecardId = core.getInput('scorecard-id');
     const catalogInfoPath = (_a = core.getInput('catalog-info-path')) !== null && _a !== void 0 ? _a : './catalog-info.yaml';
@@ -75,9 +76,9 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     const triggerOnDemandRun = (entities) => __awaiter(void 0, void 0, void 0, function* () {
-        var _b, _c;
+        var _d, _e;
         const entityRef = entities.map(it => (0, catalog_model_1.stringifyEntityRef)(it))[entitySelector];
-        const branchRef = (_c = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head) === null || _c === void 0 ? void 0 : _c.ref;
+        const branchRef = (_e = (_d = github_1.context.payload.pull_request) === null || _d === void 0 ? void 0 : _d.head) === null || _e === void 0 ? void 0 : _e.ref;
         const urlPostfix = !(0, isEmpty_1.default)(checkId)
             ? `checks/${checkId}/action`
             : `scorecards/${scorecardId}/action`;
@@ -111,11 +112,27 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const onDemandResult = yield triggerOnDemandRun(parsedManifest);
         if (onDemandResult && isScorecardResponse(onDemandResult)) {
             console.log(JSON.stringify(onDemandResult));
-            console.log(Object.values(onDemandResult.data).map(result => result.checkResults.checkResults.map(individualResult => individualResult.result)));
+            const results = Object.values(onDemandResult.data).map(result => result.checkResults.checkResults.map(individualResult => individualResult.result));
+            console.log(results);
+            const octokit = (0, github_1.getOctokit)(repoToken);
+            yield octokit.rest.issues.createComment({
+                issue_number: (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.number,
+                owner: github_1.context.payload.repo.owner,
+                repo: github_1.context.payload.repo.name,
+                body: JSON.stringify(results),
+            });
         }
         if (onDemandResult && !isScorecardResponse(onDemandResult)) {
             console.log(JSON.stringify(onDemandResult));
-            console.log(onDemandResult.data.checkResults.checkResults.map(individualResult => individualResult.result));
+            const results = onDemandResult.data.checkResults.checkResults.map(individualResult => individualResult.result);
+            console.log(results);
+            const octokit = (0, github_1.getOctokit)(repoToken);
+            yield octokit.rest.issues.createComment({
+                issue_number: (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.number,
+                owner: github_1.context.payload.repo.owner,
+                repo: github_1.context.payload.repo.name,
+                body: JSON.stringify(results),
+            });
         }
         return;
     }

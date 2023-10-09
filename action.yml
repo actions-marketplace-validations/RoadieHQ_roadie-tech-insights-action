@@ -18,6 +18,10 @@ inputs:
   entity-selector:
     description: 'An index of the entity to use from a multiyaml manifest file.'
     required: false
+  repo-token:
+    description: "A GitHub token for API access. Defaults to {{ github.token }}."
+    default: "${{ github.token }}"
+    required: true
 branding:
   icon: 'check-circle'
   color: 'orange'

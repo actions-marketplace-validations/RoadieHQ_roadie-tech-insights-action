@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as yaml from 'yaml';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
-import { context } from '@actions/github';
+import { context, getOctokit } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import isEmpty from 'lodash/isEmpty';
 
@@ -45,6 +45,7 @@ const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 
 const run = async () => {
+  const repoToken = core.getInput('repo-token', { required: true });
   const checkId = core.getInput('check-id');
   const scorecardId = core.getInput('scorecard-id');
   const catalogInfoPath =
@@ -133,21 +134,35 @@ const run = async () => {
 
     if (onDemandResult && isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
-      console.log(
-        Object.values(onDemandResult.data).map(result =>
-          result.checkResults.checkResults.map(
-            individualResult => individualResult.result,
-          ),
-        ),
-      );
-    }
-    if (onDemandResult && !isScorecardResponse(onDemandResult)) {
-      console.log(JSON.stringify(onDemandResult));
-      console.log(
-        onDemandResult.data.checkResults.checkResults.map(
+      const results = Object.values(onDemandResult.data).map(result =>
+        result.checkResults.checkResults.map(
           individualResult => individualResult.result,
         ),
       );
+      console.log(results);
+
+      const octokit = getOctokit(repoToken);
+      await octokit.rest.issues.createComment({
+        issue_number: context.payload.pull_request?.number!,
+        owner: context.payload.repo.owner,
+        repo: context.payload.repo.name,
+        body: JSON.stringify(results),
+      });
+    }
+    if (onDemandResult && !isScorecardResponse(onDemandResult)) {
+      console.log(JSON.stringify(onDemandResult));
+      const results = onDemandResult.data.checkResults.checkResults.map(
+        individualResult => individualResult.result,
+      );
+      console.log(results);
+
+      const octokit = getOctokit(repoToken);
+      await octokit.rest.issues.createComment({
+        issue_number: context.payload.pull_request?.number!,
+        owner: context.payload.repo.owner,
+        repo: context.payload.repo.name,
+        body: JSON.stringify(results),
+      });
     }
 
     return;
