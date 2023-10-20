@@ -68,19 +68,19 @@ const run = async () => {
 
   if (!checkId && !scorecardId) {
     core.setFailed(`No 'check-id' or 'scorecard-id' configured.`);
-    console.warn(`No checkId or scorecardId configured. Cannot continue.`);
+    core.error(`No checkId or scorecardId configured. Cannot continue.`);
     return;
   }
 
   if (checkId && scorecardId) {
     core.setFailed(`Only one of 'check-id' or 'scorecard-id' can be input.`);
-    console.warn(`Both checkId and scorecardId configured. Cannot continue.`);
+    core.error(`Both checkId and scorecardId configured. Cannot continue.`);
     return;
   }
 
   if (!apiToken || apiToken === '') {
     core.setFailed(`No api-token input value found.`);
-    console.warn(`No api-token input value found. Cannot continue.`);
+    core.error(`No api-token input value found. Cannot continue.`);
     return;
   }
 
@@ -96,7 +96,7 @@ const run = async () => {
       ? `checks/${checkId}/action`
       : `scorecards/${scorecardId}/action`;
     const url = `${API_URL}/${urlPostfix}`;
-    console.log(
+    core.info(
       `Running Tech Insights with parameters:  \nBranch:${branchRef}  \nEntityRef: ${entityRef}  \nCheck Id: ${checkId}  \nScorecard Id: ${scorecardId}.\n\n Calling URL: ${url}`,
     );
 
@@ -124,7 +124,7 @@ const run = async () => {
       core.setFailed(
         `No catalog-info file matching the path ${catalogInfoPath} found`,
       );
-      console.warn(
+      core.error(
         `No catalog-info file matching the path ${catalogInfoPath} found`,
       );
       return;
@@ -132,6 +132,13 @@ const run = async () => {
     const parsedManifest = roadieManifest.map(yamlDoc => yamlDoc.toJS());
 
     const onDemandResult = await triggerOnDemandRun(parsedManifest);
+
+    if (!onDemandResult.data) {
+      core.info(
+        `No data received when running on-demand action. Maybe the check or scorecard id doesn't exist or this entity is not part of the applicable entities?`,
+      );
+      return;
+    }
 
     if (onDemandResult && isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
@@ -145,8 +152,7 @@ const run = async () => {
       try {
         await comment({ repoToken, content: JSON.stringify(results) });
       } catch (e: any) {
-        console.log(e);
-        console.log(e.message);
+        core.error(e.message);
       }
     }
     if (onDemandResult && !isScorecardResponse(onDemandResult)) {
@@ -222,7 +228,7 @@ async function comment({
       }
     }
 
-    const { data: comment } = await octokit.rest.issues.createComment({
+    await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number,
       body,

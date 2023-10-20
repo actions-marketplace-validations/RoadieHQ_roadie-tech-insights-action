@@ -35,4 +35,4 @@ jobs:
           catalog-info-path: './catalog-info.yaml'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
-          check-id: 'fed536e1-af47-4591-9714-098a44762cb1'
+          check-id: 'c5c1a32b-49e0-42e9-a0dd-791ffa6d2227'
