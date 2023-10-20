@@ -181,7 +181,7 @@ const run = async () => {
         await comment({
           id: scorecardId,
           repoToken,
-          content: md.render(`
+          content: `
 ## Scorecard Results
 **Scorecard**: ${scorecard.title}\n
 **Description**: ${scorecard.description}\n\n
@@ -200,7 +200,7 @@ ${scorecardResult} checks succeeded.
 ${checkResults
   .map(it => `| ${it.name} |  ${it.description} | ${it.result} |`)
   .join('\n')}
-          `),
+          `,
         });
       } catch (e: any) {
         core.error(e.message);
