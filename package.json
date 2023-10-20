@@ -1,6 +1,6 @@
 {
   "name": "roadie-tech-insights-action",
-  "version": "0.0.11-alpha",
+  "version": "0.0.12-alpha",
   "description": "Run Roadie Tech Insights scorecards or checks and keep track of your tech health",
   "repository": "git@github.com:RoadieHQ/roadie-tech-insights-action.git",
   "author": "Roadie <engineering@roadie.io>",
