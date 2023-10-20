@@ -40,6 +40,7 @@ jobs:
       - name: Run Tech Insights scorecard
         uses: roadiehq/tech-insights-action
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_API_KEY }}
           catalog-info-path: './catalog-info.yaml'
           scorecard-id: 1111-2222-3333
@@ -59,6 +60,7 @@ jobs:
       - name: Run Tech Insights scorecard
         uses: roadiehq/tech-insights-action
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_API_KEY }}
           catalog-info-path: './catalog-info.yaml'
           check-id: 1111-2222-3333
