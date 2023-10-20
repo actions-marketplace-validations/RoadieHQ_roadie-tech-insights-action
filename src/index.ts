@@ -142,27 +142,51 @@ const run = async () => {
 
     if (onDemandResult && isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
-      const results = Object.values(onDemandResult.data).map(result =>
-        result.checkResults.checkResults.map(
-          individualResult => individualResult.result,
-        ),
+      const results = onDemandResult.data[scorecardId];
+      if (!results) {
+        core.info('Received an empty result for scorecard');
+        return;
+      }
+
+      const checkResults = results.checkResults.checkResults.map(
+        checkResult => ({
+          result: checkResult.result,
+          name: checkResult.check.name,
+          description: checkResult.check.description,
+        }),
       );
-      console.log(results);
 
       try {
-        await comment({ repoToken, content: JSON.stringify(results) });
+        await comment({
+          repoToken,
+          content: JSON.stringify(checkResults),
+          id: scorecardId,
+        });
       } catch (e: any) {
         core.error(e.message);
       }
     }
     if (onDemandResult && !isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
-      const results = onDemandResult.data.checkResults.checkResults.map(
-        individualResult => individualResult.result,
-      );
-      console.log(results);
+      const results = onDemandResult.data;
+      if (!results) {
+        core.info('Received an empty result for check');
+        return;
+      }
 
-      await comment({ repoToken, content: JSON.stringify(results) });
+      const checkResults = results.checkResults.checkResults.map(
+        checkResult => ({
+          result: checkResult.result,
+          name: checkResult.check.name,
+          description: checkResult.check.description,
+        }),
+      );
+
+      await comment({
+        repoToken,
+        content: JSON.stringify(checkResults),
+        id: checkId,
+      });
     }
 
     return;
@@ -172,9 +196,11 @@ const run = async () => {
 };
 
 async function comment({
+  id,
   repoToken,
   content,
 }: {
+  id: string;
   repoToken: string;
   content: string;
 }) {
@@ -191,7 +217,7 @@ async function comment({
       return;
     }
 
-    const comment_tag_pattern = `<!-- roadie-tech-insights-action-comment -->`;
+    const comment_tag_pattern = `<!-- roadie-tech-insights-action-comment-${id} -->`;
     const body = comment_tag_pattern
       ? `${content}\n${comment_tag_pattern}`
       : content;
