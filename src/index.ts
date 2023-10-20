@@ -6,6 +6,13 @@ import { context, getOctokit } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import isEmpty from 'lodash/isEmpty';
 import { GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
+import markdownCreator from 'markdown-it';
+
+const md = markdownCreator({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 type CheckResultContents = {
   result: boolean;
@@ -150,16 +157,37 @@ const run = async () => {
 
       const checkResults = results.checkResults.checkResults.map(
         checkResult => ({
-          result: checkResult.result,
+          result: checkResult.result ? ':white_check_mark:' : ':no_entry_sign:',
           name: checkResult.check.name,
           description: checkResult.check.description,
         }),
       );
 
+      const successfulChecks = checkResults.filter(it => it.result);
+      const scorecardResult = `${successfulChecks.length} / ${checkResults.length}`;
+
       try {
         await comment({
           repoToken,
-          content: JSON.stringify(checkResults),
+          content: md.render(`
+## Scorecard Results
+Scorecard: namenamene
+Description: descdesc desc
+
+**Result** 
+${
+  successfulChecks.length === checkResults.length
+    ? ':white_check_mark:'
+    : ':no_entry_sign:'
+}
+${scorecardResult}          
+          
+| Check         | Description | Result |
+|--------------|-----|:-----------:|
+${checkResults.map(
+  it => `| ${it.name} |  ${it.description} | ${it.result} |\n`,
+)}
+          `),
           id: scorecardId,
         });
       } catch (e: any) {
@@ -167,7 +195,6 @@ const run = async () => {
       }
     }
     if (onDemandResult && !isScorecardResponse(onDemandResult)) {
-      console.log(JSON.stringify(onDemandResult));
       const results = onDemandResult.data;
       if (!results) {
         core.info('Received an empty result for check');
@@ -176,15 +203,26 @@ const run = async () => {
 
       const checkResults = results.checkResults.checkResults.map(
         checkResult => ({
-          result: checkResult.result,
+          result: checkResult.result ? ':white_check_mark:' : ':no_entry_sign:',
           name: checkResult.check.name,
           description: checkResult.check.description,
         }),
       );
 
+      const checkResult =
+        checkResults.length > 0
+          ? checkResults[0]
+          : { name: 'unknown', result: 'unknown', description: '' };
       await comment({
         repoToken,
-        content: JSON.stringify(checkResults),
+        content: md.render(`
+## Check Result
+Check: ${checkResult.name}
+Description: ${checkResult.description}
+
+**Result** 
+${checkResult.result}     
+          `),
         id: checkId,
       });
     }
