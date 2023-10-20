@@ -24,6 +24,7 @@ jobs:
         uses: ./
         with:
           catalog-info-path: './catalog-info.yaml'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
           scorecard-id: '70dad3a9-f3c6-4adf-a337-ddd77d9c0458'
 
@@ -32,5 +33,6 @@ jobs:
         uses: ./
         with:
           catalog-info-path: './catalog-info.yaml'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
           check-id: 'fed536e1-af47-4591-9714-098a44762cb1'

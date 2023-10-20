@@ -45,12 +45,7 @@ const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
 
 const run = async () => {
-  let repoToken = core.getInput('repo-token');
-  if (!repoToken) {
-    repoToken = 'failed';
-  }
-
-  console.log(repoToken);
+  const repoToken = core.getInput('repo-token', { required: true });
   const checkId = core.getInput('check-id');
   const scorecardId = core.getInput('scorecard-id');
   const catalogInfoPath =
