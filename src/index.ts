@@ -149,18 +149,13 @@ const run = async () => {
 
     if (onDemandResult && isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
-      const results = onDemandResult.data[scorecardId];
-      if (!results) {
-        core.info('Received an empty result for scorecard');
-        return;
-      }
 
-      const checkResults = results.checkResults.checkResults.map(
-        checkResult => ({
+      const checkResults = Object.values(onDemandResult.data).flatMap(result =>
+        result.checkResults.checkResults.map(checkResult => ({
           result: checkResult.result ? ':white_check_mark:' : ':no_entry_sign:',
           name: checkResult.check.name,
           description: checkResult.check.description,
-        }),
+        })),
       );
 
       const successfulChecks = checkResults.filter(it => it.result);
@@ -172,8 +167,8 @@ const run = async () => {
           repoToken,
           content: md.render(`
 ## Scorecard Results
-Scorecard: namenamene\n
-Description: descdesc desc\n\n
+**Scorecard**: namenamene\n
+**Description**: descdesc desc\n\n
 
 #### Result \n
 ${
@@ -219,8 +214,8 @@ ${checkResults.map(
         id: checkId,
         content: md.render(`
 ## Check Result
-Check: ${checkResult.name}\n
-Description: ${checkResult.description}\n\n
+**Check**: ${checkResult.name}\n
+**Description**: ${checkResult.description}\n\n
 
 #### Result \n
 ${checkResult.result}     
