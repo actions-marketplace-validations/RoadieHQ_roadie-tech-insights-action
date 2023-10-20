@@ -28,6 +28,7 @@ type CheckResult = {
   entity: string;
   checkResults: CheckResultContents[];
 };
+
 type OnDemandCheckResult = {
   checkResults: CheckResult;
   factResults: {
@@ -38,7 +39,13 @@ type OnDemandCheckResult = {
 };
 
 type ScorecardResultResponse = {
-  data: Record<string, OnDemandCheckResult>;
+  data: {
+    results: Record<string, OnDemandCheckResult>;
+    scorecard: {
+      title: string;
+      description: string;
+    };
+  };
 };
 
 type CheckResultResponse = {
@@ -48,6 +55,10 @@ type CheckResultResponse = {
 const isScorecardResponse = (
   it: ScorecardResultResponse | CheckResultResponse,
 ): it is ScorecardResultResponse => !('checkResults' in it.data);
+
+const isCheckResponse = (
+  it: ScorecardResultResponse | CheckResultResponse,
+): it is CheckResultResponse => 'checkResults' in it.data;
 
 const API_URL = 'https://api.roadie.so/api/tech-insights/v1';
 const ACTION_TYPE = 'run-on-demand';
@@ -148,17 +159,22 @@ const run = async () => {
     }
 
     if (onDemandResult && isScorecardResponse(onDemandResult)) {
-      console.log(JSON.stringify(onDemandResult));
+      core.debug(JSON.stringify(onDemandResult));
 
-      const checkResults = Object.values(onDemandResult.data).flatMap(result =>
-        result.checkResults.checkResults.map(checkResult => ({
-          result: checkResult.result ? ':white_check_mark:' : ':no_entry_sign:',
-          name: checkResult.check.name,
-          description: checkResult.check.description,
-        })),
+      const checkResults = Object.values(onDemandResult.data.results).flatMap(
+        result =>
+          result.checkResults.checkResults.map(checkResult => ({
+            result: checkResult.result
+              ? ':white_check_mark:'
+              : ':no_entry_sign:',
+            name: checkResult.check.name,
+            description: checkResult.check.description,
+          })),
       );
-
-      const successfulChecks = checkResults.filter(it => it.result);
+      const scorecard = onDemandResult.data.scorecard;
+      const successfulChecks = checkResults.filter(
+        it => it.result === ':white_check_mark:',
+      );
       const scorecardResult = `${successfulChecks.length} / ${checkResults.length}`;
 
       try {
@@ -167,8 +183,8 @@ const run = async () => {
           repoToken,
           content: md.render(`
 ## Scorecard Results
-**Scorecard**: namenamene\n
-**Description**: descdesc desc\n\n
+**Scorecard**: ${scorecard.title}\n
+**Description**: ${scorecard.description}\n\n
 
 #### Result \n
 ${
@@ -176,7 +192,7 @@ ${
     ? ':white_check_mark:'
     : ':no_entry_sign:'
 }\n
-${scorecardResult}\n           
+${scorecardResult} checks succeeded.\n           
           
 #### Check Results       
 | Check         | Description | Result |
@@ -190,13 +206,13 @@ ${checkResults.map(
         core.error(e.message);
       }
     }
-    if (onDemandResult && !isScorecardResponse(onDemandResult)) {
+    if (onDemandResult && isCheckResponse(onDemandResult)) {
+      core.debug(JSON.stringify(onDemandResult));
       const results = onDemandResult.data;
       if (!results) {
         core.info('Received an empty result for check');
         return;
       }
-
       const checkResults = results.checkResults.checkResults.map(
         checkResult => ({
           result: checkResult.result ? ':white_check_mark:' : ':no_entry_sign:',
