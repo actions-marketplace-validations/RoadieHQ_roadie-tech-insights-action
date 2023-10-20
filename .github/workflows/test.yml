@@ -25,7 +25,7 @@ jobs:
         with:
           catalog-info-path: './catalog-info.yaml'
           api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
-          scorecard-id: '1111-2222'
+          scorecard-id: '70dad3a9-f3c6-4adf-a337-ddd77d9c0458'
 
       - name: Test Roadie Tech Insights on-demand Check API call
         id: test-action-check
@@ -33,4 +33,4 @@ jobs:
         with:
           catalog-info-path: './catalog-info.yaml'
           api-token: ${{ secrets.ROADIE_ROADIE_API_KEY }}
-          check-id: '1111-2222'
+          check-id: 'fed536e1-af47-4591-9714-098a44762cb1'

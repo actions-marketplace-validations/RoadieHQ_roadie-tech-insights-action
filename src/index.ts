@@ -46,6 +46,8 @@ const ACTION_TYPE = 'run-on-demand';
 
 const run = async () => {
   const repoToken = core.getInput('repo-token', { required: true });
+
+  console.log(repoToken);
   const checkId = core.getInput('check-id');
   const scorecardId = core.getInput('scorecard-id');
   const catalogInfoPath =
