@@ -19,8 +19,9 @@ inputs:
     description: 'An index of the entity to use from a multiyaml manifest file.'
     required: false
   repo-token:
-    description: "A GitHub token for API access. you can use secrets.GITHUB_TOKEN env variable for the default token."
-    required: true
+    description: "A GitHub token for API access. Defaults to secrets.GITHUB_TOKEN env variable for the default token."
+    required: false
+    default: ${{ secrets.GITHUB_TOKEN }}
 branding:
   icon: 'check-circle'
   color: 'orange'
