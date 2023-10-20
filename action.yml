@@ -20,7 +20,7 @@ inputs:
     required: false
   repo-token:
     description: "A GitHub token for API access. Defaults to {{ secrets.GITHUB_TOKEN }}."
-    default: "${{ secrets.GITHUB_TOKEN }}"
+    default: "${{ GITHUB_TOKEN }}"
     required: true
 branding:
   icon: 'check-circle'
