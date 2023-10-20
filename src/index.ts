@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import { context, getOctokit } from '@actions/github';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import isEmpty from 'lodash/isEmpty';
+import { GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
 
 type CheckResultContents = {
   result: boolean;
@@ -141,14 +142,8 @@ const run = async () => {
       );
       console.log(results);
 
-      const octokit = getOctokit(repoToken);
       try {
-        await octokit.rest.issues.createComment({
-          issue_number: context.payload.pull_request?.number!,
-          owner: context.payload.repository?.owner.name!,
-          repo: context.payload.repository?.name!,
-          body: JSON.stringify(results),
-        });
+        await comment({ repoToken, content: JSON.stringify(results) });
       } catch (e: any) {
         console.log(e);
         console.log(e.message);
@@ -161,13 +156,7 @@ const run = async () => {
       );
       console.log(results);
 
-      const octokit = getOctokit(repoToken);
-      await octokit.rest.issues.createComment({
-        issue_number: context.payload.pull_request?.number!,
-        owner: context.payload.repository?.owner.name!,
-        repo: context.payload.repository?.name!,
-        body: JSON.stringify(results),
-      });
+      await comment({ repoToken, content: JSON.stringify(results) });
     }
 
     return;
@@ -175,5 +164,74 @@ const run = async () => {
     core.setFailed((error as Error).message);
   }
 };
+
+async function comment({
+  repoToken,
+  content,
+}: {
+  repoToken: string;
+  content: string;
+}) {
+  try {
+    const issue_number =
+      context.payload.pull_request?.number || context.payload.issue?.number;
+
+    const octokit = getOctokit(repoToken);
+
+    if (!issue_number) {
+      core.setFailed(
+        'No issue/pull request in input neither in current context.',
+      );
+      return;
+    }
+
+    const comment_tag_pattern = `<!-- roadie-tech-insights-action-comment -->`;
+    const body = comment_tag_pattern
+      ? `${content}\n${comment_tag_pattern}`
+      : content;
+
+    if (comment_tag_pattern) {
+      type ListCommentsResponseDataType = GetResponseDataTypeFromEndpointMethod<
+        typeof octokit.rest.issues.listComments
+      >;
+      let comment: ListCommentsResponseDataType[0] | undefined;
+      for await (const { data: comments } of octokit.paginate.iterator(
+        octokit.rest.issues.listComments,
+        {
+          ...context.repo,
+          issue_number,
+        },
+      )) {
+        comment = comments.find(
+          comment => comment?.body?.includes(comment_tag_pattern),
+        );
+        if (comment) break;
+      }
+
+      if (comment) {
+        await octokit.rest.issues.updateComment({
+          ...context.repo,
+          comment_id: comment.id,
+          body,
+        });
+        return;
+      } else {
+        core.info(
+          'No comment has been found with asked pattern. Creating a new comment.',
+        );
+      }
+    }
+
+    const { data: comment } = await octokit.rest.issues.createComment({
+      ...context.repo,
+      issue_number,
+      body,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
+  }
+}
 
 run();
