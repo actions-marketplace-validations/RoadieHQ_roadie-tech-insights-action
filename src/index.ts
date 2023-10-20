@@ -171,6 +171,7 @@ const run = async () => {
             description: checkResult.check.description,
           })),
       );
+      console.log(checkResults);
       const scorecard = onDemandResult.data.scorecard;
       const successfulChecks = checkResults.filter(
         it => it.result === ':white_check_mark:',
