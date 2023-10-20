@@ -46,7 +46,6 @@ const ACTION_TYPE = 'run-on-demand';
 
 const run = async () => {
   const repoToken = core.getInput('repo-token', { required: true });
-  console.log(repoToken);
   const checkId = core.getInput('check-id');
   const scorecardId = core.getInput('scorecard-id');
   const catalogInfoPath =
@@ -143,12 +142,17 @@ const run = async () => {
       console.log(results);
 
       const octokit = getOctokit(repoToken);
-      await octokit.rest.issues.createComment({
-        issue_number: context.payload.pull_request?.number!,
-        owner: context.payload.repository?.owner.name!,
-        repo: context.payload.repository?.name!,
-        body: JSON.stringify(results),
-      });
+      try {
+        await octokit.rest.issues.createComment({
+          issue_number: context.payload.pull_request?.number!,
+          owner: context.payload.repository?.owner.name!,
+          repo: context.payload.repository?.name!,
+          body: JSON.stringify(results),
+        });
+      } catch (e: any) {
+        console.log(e);
+        console.log(e.message);
+      }
     }
     if (onDemandResult && !isScorecardResponse(onDemandResult)) {
       console.log(JSON.stringify(onDemandResult));
