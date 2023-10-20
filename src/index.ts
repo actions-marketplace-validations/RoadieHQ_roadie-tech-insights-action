@@ -171,6 +171,7 @@ const run = async () => {
             description: checkResult.check.description,
           })),
       );
+      core.debug(checkResults);
       const scorecard = onDemandResult.data.scorecard;
       const successfulChecks = checkResults.filter(
         it => it.result === ':white_check_mark:',
@@ -181,7 +182,7 @@ const run = async () => {
         await comment({
           id: scorecardId,
           repoToken,
-          content: md.render(`
+          content: `
 ## Scorecard Results
 **Scorecard**: ${scorecard.title}\n
 **Description**: ${scorecard.description}\n\n
@@ -192,15 +193,15 @@ ${
     ? ':white_check_mark:'
     : ':no_entry_sign:'
 }\n
-${scorecardResult} checks succeeded.\n           
+${scorecardResult} checks succeeded.           
           
 #### Check Results       
 | Check         | Description | Result |
 |--------------|-----|:-----------:|
-${checkResults.map(
-  it => `| ${it.name} |  ${it.description} | ${it.result} |\n`,
-)}
-          `),
+${checkResults
+  .map(it => `| ${it.name} |  ${it.description} | ${it.result} |`)
+  .join('\n')}
+          `,
         });
       } catch (e: any) {
         core.error(e.message);
