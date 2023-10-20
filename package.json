@@ -18,11 +18,13 @@
     "@vercel/ncc": "^0.36.1",
     "lodash": "^4.17.21",
     "yaml": "^2.2.2",
+    "markdown-it": "^13.0.2",
     "node-fetch": "^3.3.1",
     "simple-git": "^3.18.0"
   },
   "devDependencies": {
     "@spotify/prettier-config": "^12.0.0",
+    "@types/markdown-it": "^13.0.4",
     "@types/node": "^18.16.4",
     "@types/lodash": "^4.14.199",
     "prettier": "^3.0.3",
