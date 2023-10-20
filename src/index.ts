@@ -168,27 +168,28 @@ const run = async () => {
 
       try {
         await comment({
+          id: scorecardId,
           repoToken,
           content: md.render(`
 ## Scorecard Results
-Scorecard: namenamene
-Description: descdesc desc
+Scorecard: namenamene\n
+Description: descdesc desc\n\n
 
-**Result** 
+#### Result \n
 ${
   successfulChecks.length === checkResults.length
     ? ':white_check_mark:'
     : ':no_entry_sign:'
-}
-${scorecardResult}          
+}\n
+${scorecardResult}\n           
           
+#### Check Results       
 | Check         | Description | Result |
 |--------------|-----|:-----------:|
 ${checkResults.map(
   it => `| ${it.name} |  ${it.description} | ${it.result} |\n`,
 )}
           `),
-          id: scorecardId,
         });
       } catch (e: any) {
         core.error(e.message);
@@ -215,15 +216,15 @@ ${checkResults.map(
           : { name: 'unknown', result: 'unknown', description: '' };
       await comment({
         repoToken,
+        id: checkId,
         content: md.render(`
 ## Check Result
-Check: ${checkResult.name}
-Description: ${checkResult.description}
+Check: ${checkResult.name}\n
+Description: ${checkResult.description}\n\n
 
-**Result** 
+#### Result \n
 ${checkResult.result}     
           `),
-        id: checkId,
       });
     }
 
