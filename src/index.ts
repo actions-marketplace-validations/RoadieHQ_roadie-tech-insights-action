@@ -192,14 +192,14 @@ ${
     ? ':white_check_mark:'
     : ':no_entry_sign:'
 }\n
-${scorecardResult} checks succeeded.\n           
+${scorecardResult} checks succeeded.           
           
 #### Check Results       
 | Check         | Description | Result |
 |--------------|-----|:-----------:|
-${checkResults.map(
-  it => `| ${it.name} |  ${it.description} | ${it.result} |\n`,
-)}
+${checkResults
+  .map(it => `| ${it.name} |  ${it.description} | ${it.result} |`)
+  .join('\n')}
           `),
         });
       } catch (e: any) {
