@@ -63,5 +63,14 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_API_KEY }}
           catalog-info-path: './catalog-info.yaml'
+
+
+### Screenshot
+
+The GitHub action comments on the Pull Request it is ran against with a comment indicating the current results of the scorecard, calculated against the PR branch.
+![image](https://github.com/RoadieHQ/roadie-tech-insights-action/assets/2392775/442c7dc3-d473-4bd5-899f-6449c72d06f0)
+
+
+
           check-id: 1111-2222-3333
 ```
