@@ -63,7 +63,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.ROADIE_API_KEY }}
           catalog-info-path: './catalog-info.yaml'
-
+          check-id: 1111-2222-3333
+```
 
 ### Screenshot
 
@@ -72,5 +73,3 @@ The GitHub action comments on the Pull Request it is ran against with a comment 
 
 
 
-          check-id: 1111-2222-3333
-```
